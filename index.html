@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PintarKu - Platform Belajar Interaktif Pelajar</title>
+    <!-- Memuat Tailwind CSS untuk styling modern dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Google Fonts: Plus Jakarta Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Memuat Lucide Icons untuk ikon antarmuka yang bersih -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+    <!-- ==================== NOTIFIKASI TOAST (PENGGANTI ALERT) ==================== -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- ==================== HALAMAN AUTENTIKASI (LOGIN & DAFTAR) ==================== -->
+    <main id="auth-view" class="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-indigo-50 via-white to-sky-50">
+        <div class="w-full max-w-5xl bg-white rounded-3xl shadow-xl shadow-indigo-100/60 border border-slate-100 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+            
+            <!-- Bagian Kiri: Ilustrasi & Sambutan Ramah Pelajar -->
+            <div class="lg:col-span-6 bg-gradient-to-br from-brand-600 via-indigo-600 to-violet-700 p-8 sm:p-12 text-white flex flex-col justify-between relative overflow-hidden">
+                <!-- Dekorasi Latar -->
+                <div class="absolute -top-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-sky-400/20 rounded-full blur-2xl"></div>
+
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2.5 bg-white/15 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20 mb-8">
+                        <i data-lucide="graduation-cap" class="w-6 h-6 text-amber-300"></i>
+                        <span class="font-heading font-bold text-lg tracking-tight">PintarKu</span>
+                    </div>
+                    
+                    <h1 class="font-heading text-3xl sm:text-4xl font-extrabold leading-tight mb-4">
+                        Belajar Jadi Lebih Seru & Mudah Dipahami!
+                    </h1>
+                    <p class="text-indigo-100 text-base sm:text-lg leading-relaxed mb-8">
+                        Akses materi pelajaran interaktif, pantau progres belajarmu setiap hari, dan uji pemahamanmu lewat kuis singkat yang menyenangkan.
+                    </p>
+                </div>
+
+                <!-- Kartu Fitur Unggulan -->
+                <div class="relative z-10 space-y-3 bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/15">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-sm font-medium text-white">4 Mata Pelajaran Utama & Terstruktur</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0">
+                            <i data-lucide="zap" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-sm font-medium text-white">Kuis Interaktif dengan Nilai Langsung</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-sky-400/20 text-sky-300 flex items-center justify-center shrink-0">
+                            <i data-lucide="award" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-sm font-medium text-white">Pelacakan Progres & Lencana Belajar</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bagian Kanan: Form Login & Daftar -->
+            <div class="lg:col-span-6 p-8 sm:p-12 flex flex-col justify-center">
+                <!-- Tab Switcher Login / Daftar -->
+                <div class="flex p-1.5 bg-slate-100 rounded-2xl mb-8">
+                    <button type="button" id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-sm font-semibold rounded-xl bg-white text-brand-600 shadow-sm transition-all">
+                        Masuk Akun
+                    </button>
+                    <button type="button" id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-sm font-semibold rounded-xl text-slate-600 hover:text-slate-900 transition-all">
+                        Daftar Baru
+                    </button>
+                </div>
+
+                <!-- FORM LOGIN -->
+                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+                    <div>
+                        <h2 class="font-heading text-2xl font-bold text-slate-900">Selamat Datang Kembali! 👋</h2>
+                        <p class="text-sm text-slate-500 mt-1">Masuk untuk melanjutkan petualangan belajarmu.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Email Pelajar</label>
+                        <div class="relative">
+                            <i data-lucide="mail" class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                            <input type="email" id="login-email" required placeholder="nama@sekolah.sch.id" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Kata Sandi</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                            <input type="password" id="login-password" required placeholder="Masukkan kata sandi" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/30 transition-all flex items-center justify-center gap-2">
+                        <span>Mulai Belajar Sekarang</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+
+                    <!-- Tombol Demo Akun Instan -->
+                    <div class="pt-4 border-t border-slate-100 text-center">
+                        <p class="text-xs text-slate-500 mb-2.5">Ingin langsung mencoba tanpa mengetik?</p>
+                        <button type="button" onclick="loginDemoAccount()" class="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-medium text-sm rounded-xl transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-amber-600"></i>
+                            <span>Masuk dengan Akun Demo Pelajar</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- FORM REGISTER (TERSEMBUNYI AWALNYA) -->
+                <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                    <div>
+                        <h2 class="font-heading text-2xl font-bold text-slate-900">Buat Akun Pelajar 🚀</h2>
+                        <p class="text-sm text-slate-500 mt-1">Gratis! Simpan semua progres dan skor kuismu.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
+                        <div class="relative">
+                            <i data-lucide="user" class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                            <input type="text" id="reg-name" required placeholder="Contoh: Budi Santoso" class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Jenjang / Kelas</label>
+                            <select id="reg-grade" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                                <option value="SMP Kelas 7-9">SMP (Kelas 7 - 9)</option>
+                                <option value="SMA Kelas 10">SMA / SMK Kelas 10</option>
+                                <option value="SMA Kelas 11">SMA / SMK Kelas 11</option>
+                                <option value="SMA Kelas 12">SMA / SMK Kelas 12</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                            <input type="email" id="reg-email" required placeholder="budi@email.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Buat Kata Sandi</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                            <input type="password" id="reg-password" required minlength="4" placeholder="Minimal 4 karakter" class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/30 transition-all flex items-center justify-center gap-2 mt-2">
+                        <span>Daftar & Masuk</span>
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== HALAMAN DASHBOARD BELAJAR (SETELAH LOGIN) ==================== -->
+    <div id="dashboard-view" class="hidden flex-col min-h-screen">
+        
+        <!-- Navbar Atas -->
+        <header class="bg-white border-b border-slate-200/80 sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 bg-brand-600 text-white rounded-xl flex items-center justify-center shadow-sm">
+                        <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                    </div>
+                    <span class="font-heading font-bold text-xl text-slate-900 tracking-tight">PintarKu</span>
+                </div>
+
+                <!-- Profil Pelajar & Tombol Keluar -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="hidden sm:flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full border border-amber-200/80 text-xs font-semibold">
+                        <i data-lucide="flame" class="w-4 h-4 text-amber-500 fill-amber-500"></i>
+                        <span id="nav-points">0 Poin XP</span>
+                    </div>
+
+                    <button onclick="openProfileModal()" class="flex items-center gap-2.5 p-1.5 pr-3 rounded-full hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200">
+                        <div id="nav-avatar" class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-600 to-sky-500 text-white font-bold text-sm flex items-center justify-center">
+                            P
+                        </div>
+                        <div class="text-left hidden md:block">
+                            <p id="nav-username" class="text-sm font-semibold text-slate-800 leading-none">Pelajar</p>
+                            <p id="nav-grade" class="text-xs text-slate-500 mt-0.5">Kelas</p>
+                        </div>
+                    </button>
+
+                    <button onclick="handleLogout()" title="Keluar Akun" class="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Konten Utama Dashboard -->
+        <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            
+            <!-- Banner Sapaan & Ringkasan Progres -->
+            <section class="bg-gradient-to-r from-brand-600 via-indigo-600 to-blue-600 rounded-3xl p-6 sm:p-8 text-white shadow-lg shadow-indigo-200/50 relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-2xl"></div>
+                
+                <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div class="space-y-2 max-w-xl">
+                        <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-semibold tracking-wide uppercase">
+                            Dashboard Pelajar
+                        </span>
+                        <h1 class="font-heading text-2xl sm:text-3xl font-bold">
+                            Halo, <span id="welcome-name">Pelajar Hebat</span>! Semangat belajar hari ini? 🌟
+                        </h1>
+                        <p class="text-indigo-100 text-sm sm:text-base">
+                            Pilih mata pelajaran di bawah untuk membaca ringkasan materi dan kerjakan kuis singkat untuk mengumpulkan Poin XP.
+                        </p>
+                    </div>
+
+                    <!-- Kartu Progres Keseluruhan -->
+                    <div class="bg-white/15 backdrop-blur-md border border-white/20 rounded-2xl p-5 min-w-[260px] sm:min-w-[300px]">
+                        <div class="flex items-center justify-between text-sm font-medium mb-2">
+                            <span>Progres Belajar Kamu</span>
+                            <span id="overall-progress-text" class="font-bold text-amber-300">0%</span>
+                        </div>
+                        <div class="w-full h-3 bg-black/20 rounded-full overflow-hidden mb-3">
+                            <div id="overall-progress-bar" class="h-full bg-gradient-to-r from-amber-300 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-indigo-100">
+                            <span id="completed-count-text">0 dari 4 Materi Selesai</span>
+                            <span id="badge-status" class="font-semibold text-white">Pemula</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filter Kategori Mata Pelajaran -->
+            <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-heading text-xl font-bold text-slate-900">Daftar Mata Pelajaran</h2>
+                    <p class="text-sm text-slate-500">Klik pada kartu pelajaran untuk mulai membaca materi dan mengikuti kuis.</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-2" id="category-filters">
+                    <button onclick="filterSubjects('semua')" data-filter="semua" class="filter-btn active px-4 py-2 rounded-xl text-sm font-semibold bg-brand-600 text-white shadow-sm transition-all">
+                        Semua
+                    </button>
+                    <button onclick="filterSubjects('belum')" data-filter="belum" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all">
+                        Belum Selesai
+                    </button>
+                    <button onclick="filterSubjects('selesai')" data-filter="selesai" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all">
+                        Sudah Selesai
+                    </button>
+                </div>
+            </section>
+
+            <!-- Grid Kartu Mata Pelajaran -->
+            <section id="subjects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                <!-- Kartu pelajaran akan dirender secara dinamis lewat JavaScript -->
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-200/80 py-6 mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+                <p>&copy; 2026 PintarKu - Platform Belajar Interaktif untuk Pelajar Indonesia.</p>
+                <button onclick="resetProgress()" class="text-xs text-slate-400 hover:text-rose-600 underline transition-colors">
+                    Reset Progres Belajar Saya
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ==================== MODAL MATERI & KUIS INTERAKTIF ==================== -->
+    <div id="lesson-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
+            
+            <!-- Header Modal -->
+            <div id="modal-header-bg" class="p-6 text-white flex items-center justify-between bg-brand-600">
+                <div class="flex items-center gap-3">
+                    <div id="modal-icon-box" class="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span id="modal-category-badge" class="text-xs font-semibold uppercase tracking-wider bg-black/20 px-2.5 py-0.5 rounded-full">Mata Pelajaran</span>
+                        <h3 id="modal-title" class="font-heading text-xl font-bold mt-1">Judul Materi</h3>
+                    </div>
+                </div>
+                <button onclick="closeLessonModal()" class="p-2 bg-white/15 hover:bg-white/25 rounded-xl transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Navigasi Tab di dalam Modal: Materi vs Kuis -->
+            <div class="flex border-b border-slate-200 bg-slate-50 px-6 pt-3 gap-4">
+                <button id="modal-tab-materi" onclick="switchModalTab('materi')" class="pb-3 text-sm font-bold border-b-2 border-brand-600 text-brand-600 flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    <span>1. Ringkasan Materi</span>
+                </button>
+                <button id="modal-tab-kuis" onclick="switchModalTab('kuis')" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
+                    <i data-lucide="help-circle" class="w-4 h-4"></i>
+                    <span>2. Kuis Singkat (3 Soal)</span>
+                </button>
+            </div>
+
+            <!-- Isi Modal (Scrollable) -->
+            <div class="p-6 overflow-y-auto flex-grow space-y-6">
+                
+                <!-- Konten Tab 1: Materi Pelajaran -->
+                <div id="modal-content-materi" class="space-y-5">
+                    <div id="lesson-body" class="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-4">
+                        <!-- Konten materi diisi via JS -->
+                    </div>
+
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex items-start gap-3">
+                        <i data-lucide="lightbulb" class="w-5 h-5 text-brand-600 shrink-0 mt-0.5"></i>
+                        <div class="text-sm text-indigo-950">
+                            <p class="font-semibold">Tips Belajar:</p>
+                            <p id="lesson-tip" class="text-indigo-800 mt-0.5">Pahami konsep dasarnya sebelum lanjut mengerjakan kuis di tab sebelah!</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex justify-end">
+                        <button onclick="switchModalTab('kuis')" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition-all flex items-center gap-2">
+                            <span>Lanjut ke Kuis Singkat</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Konten Tab 2: Kuis Interaktif -->
+                <div id="modal-content-kuis" class="hidden space-y-6">
+                    <div id="quiz-container" class="space-y-6">
+                        <!-- Pertanyaan kuis dirender via JS -->
+                    </div>
+
+                    <!-- Hasil Kuis (Muncul setelah submit) -->
+                    <div id="quiz-result-box" class="hidden rounded-2xl p-5 border text-center space-y-3">
+                        <div id="quiz-result-icon" class="w-12 h-12 rounded-full mx-auto flex items-center justify-center"></div>
+                        <h4 id="quiz-result-title" class="font-heading text-lg font-bold"></h4>
+                        <p id="quiz-result-desc" class="text-sm"></p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                        <button onclick="switchModalTab('materi')" class="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all">
+                            &larr; Baca Materi Lagi
+                        </button>
+                        <button id="submit-quiz-btn" onclick="submitQuiz()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <span>Periksa Jawaban</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL PROFIL PELAJAR ==================== -->
+    <div id="profile-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-6">
+            <div class="flex items-center justify-between">
+                <h3 class="font-heading text-lg font-bold text-slate-900">Profil Pelajar</h3>
+                <button onclick="closeProfileModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="flex flex-col items-center text-center space-y-2">
+                <div id="profile-avatar-large" class="w-20 h-20 rounded-full bg-gradient-to-tr from-brand-600 to-sky-500 text-white font-heading font-bold text-3xl flex items-center justify-center shadow-lg">
+                    P
+                </div>
+                <h4 id="profile-name" class="font-heading text-xl font-bold text-slate-900">Nama Pelajar</h4>
+                <p id="profile-email" class="text-sm text-slate-500">email@pelajar.id</p>
+                <span id="profile-grade" class="inline-block px-3 py-1 bg-indigo-50 text-brand-700 text-xs font-semibold rounded-full">
+                    Jenjang Kelas
+                </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
+                <div>
+                    <p class="text-xs text-slate-500">Total Poin XP</p>
+                    <p id="profile-xp" class="font-heading text-xl font-bold text-amber-600 mt-0.5">0 XP</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500">Materi Selesai</p>
+                    <p id="profile-completed" class="font-heading text-xl font-bold text-emerald-600 mt-0.5">0 / 4</p>
+                </div>
+            </div>
+
+            <button onclick="closeProfileModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-all">
+                Tutup Profil
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== LOGIKA JAVASCRIPT ==================== -->
+    <script>
+        // 1. DATA MATERI PELAJARAN & KUIS INTERAKTIF
+        const SUBJECTS_DATA = [
+            {
+                id: 'matematika',
+                title: 'Aljabar & Persamaan Linear',
+                subject: 'Matematika',
+                duration: '15 Menit',
+                level: 'Dasar - Menengah',
+                color: 'from-blue-500 to-indigo-600',
+                badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
+                icon: 'calculator',
+                description: 'Pelajari cara menyederhanakan bentuk aljabar dan menyelesaikan persamaan linear satu variabel dengan mudah.',
+                tip: 'Ingat aturan pindah ruas: tanda positif (+) berubah menjadi negatif (-), dan perkalian berubah menjadi pembagian.',
+                content: `
+                    <h4 class="font-heading font-bold text-lg text-slate-900">Apa itu Persamaan Linear Satu Variabel (PLSV)?</h4>
+                    <p>Persamaan linear satu variabel adalah kalimat terbuka yang dihubungkan oleh tanda sama dengan (<strong>=</strong>) dan hanya memiliki satu variabel berpangkat satu.</p>
+                    <div class="bg-slate-100 p-4 rounded-xl font-mono text-sm text-slate-800">
+                        Bentuk Umum: <strong>ax + b = c</strong> (dengan a &ne; 0)
+                    </div>
+                    <h4 class="font-heading font-bold text-lg text-slate-900 mt-4">Contoh Penyelesaian:</h4>
+                    <p>Tentukan nilai <strong>x</strong> dari persamaan <strong>2x + 4 = 12</strong>:</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Langkah 1: Kurangi kedua ruas dengan 4 &rarr; <strong>2x = 12 - 4</strong></li>
+                        <li>Langkah 2: Sederhanakan &rarr; <strong>2x = 8</strong></li>
+                        <li>Langkah 3: Bagi kedua ruas dengan 2 &rarr; <strong>x = 8 / 2 = 4</strong></li>
+                    </ul>
+                `,
+                quiz: [
+                    {
+                        question: 'Berapakah nilai x yang memenuhi persamaan 3x - 5 = 10?',
+                        options: ['x = 3', 'x = 5', 'x = 15', 'x = 4'],
+                        answer: 1 // index 1 -> x = 5
+                    },
+                    {
+                        question: 'Sederhanakan bentuk aljabar berikut: 4a + 3b - 2a + b',
+                        options: ['6a + 4b', '2a + 2b', '2a + 4b', '6a + 2b'],
+                        answer: 2 // index 2 -> 2a + 4b
+                    },
+                    {
+                        question: 'Jika 2(x + 3) = 14, maka nilai x adalah...',
+                        options: ['4', '5', '7', '11'],
+                        answer: 0 // index 0 -> 4
+                    }
+                ]
+            },
+            {
+                id: 'inggris',
+                title: 'Simple Present & Past Tense',
+                subject: 'Bahasa Inggris',
+                duration: '12 Menit',
+                level: 'Pemula',
+                color: 'from-emerald-500 to-teal-600',
+                badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                icon: 'languages',
+                description: 'Kuasai perbedaan penggunaan kata kerja untuk rutinitas sehari-hari dan kejadian di masa lampau.',
+                tip: 'Perhatikan subjek kalimat! Untuk He, She, It pada Simple Present Tense, tambahkan akhiran -s/-es pada kata kerja.',
+                content: `
+                    <h4 class="font-heading font-bold text-lg text-slate-900">1. Simple Present Tense</h4>
+                    <p>Digunakan untuk menyatakan kebiasaan sehari-hari (<em>habits</em>) atau fakta umum (<em>general truth</em>).</p>
+                    <div class="bg-emerald-50/70 border border-emerald-100 p-4 rounded-xl text-sm space-y-1">
+                        <p><strong>Rumus:</strong> Subject + Verb 1 (s/es) + Object</p>
+                        <p><em>Contoh:</em> She <strong>reads</strong> a book every morning.</p>
+                    </div>
+                    <h4 class="font-heading font-bold text-lg text-slate-900 mt-4">2. Simple Past Tense</h4>
+                    <p>Digunakan untuk menyatakan peristiwa yang sudah terjadi dan selesai di masa lampau (<em>yesterday, last week, ago</em>).</p>
+                    <div class="bg-teal-50/70 border border-teal-100 p-4 rounded-xl text-sm space-y-1">
+                        <p><strong>Rumus:</strong> Subject + Verb 2 + Object</p>
+                        <p><em>Contoh:</em> They <strong>visited</strong> the museum yesterday.</p>
+                    </div>
+                `,
+                quiz: [
+                    {
+                        question: 'Pilih kata yang tepat: "My brother _____ to school by bicycle every day."',
+                        options: ['go', 'goes', 'went', 'going'],
+                        answer: 1 // goes
+                    },
+                    {
+                        question: 'Manakah kalimat Simple Past Tense yang benar?',
+                        options: ['We play football yesterday.', 'We plays football yesterday.', 'We played football yesterday.', 'We playing football yesterday.'],
+                        answer: 2 // We played football yesterday.
+                    },
+                    {
+                        question: 'Bentuk Verb 2 (lampau) dari kata kerja "Eat" adalah...',
+                        options: ['Eated', 'Eaten', 'Eating', 'Ate'],
+                        answer: 3 // Ate
+                    }
+                ]
+            },
+            {
+                id: 'pemrograman',
+                title: 'Logika Dasar & Variabel Coding',
+                subject: 'Pemrograman Dasar',
+                duration: '20 Menit',
+                level: 'Pemula',
+                color: 'from-violet-500 to-purple-600',
+                badgeBg: 'bg-violet-50 text-violet-700 border-violet-200',
+                icon: 'code-2',
+                description: 'Kenali bagaimana komputer menyimpan data menggunakan variabel, tipe data, dan percabangan logika If-Else.',
+                tip: 'Bayangkan variabel seperti sebuah kotak berlabel yang bisa kamu isi dengan angka, teks, atau nilai benar/salah.',
+                content: `
+                    <h4 class="font-heading font-bold text-lg text-slate-900">Apa itu Variabel dalam Pemrograman?</h4>
+                    <p><strong>Variabel</strong> adalah tempat penyimpanan sementara di memori komputer untuk menampung sebuah nilai yang dapat berubah-ubah.</p>
+                    <div class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-sm space-y-1">
+                        <p><span class="text-sky-400">let</span> namaSiswa = <span class="text-amber-300">"Alya"</span>; <span class="text-slate-400">// Tipe String (Teks)</span></p>
+                        <p><span class="text-sky-400">let</span> nilaiUjian = <span class="text-emerald-400">95</span>; <span class="text-slate-400">// Tipe Number (Angka)</span></p>
+                        <p><span class="text-sky-400">let</span> lulus = <span class="text-purple-400">true</span>; <span class="text-slate-400">// Tipe Boolean (Benar/Salah)</span></p>
+                    </div>
+                    <h4 class="font-heading font-bold text-lg text-slate-900 mt-4">Percabangan Logika (If - Else)</h4>
+                    <p>Komputer mengambil keputusan menggunakan kondisi <strong>If</strong> (Jika) dan <strong>Else</strong> (Jika tidak).</p>
+                `,
+                quiz: [
+                    {
+                        question: 'Tipe data apa yang digunakan untuk menyimpan nilai Benar (true) atau Salah (false)?',
+                        options: ['String', 'Integer', 'Boolean', 'Array'],
+                        answer: 2 // Boolean
+                    },
+                    {
+                        question: 'Jika variabel skor = 85, dan syarat lulus adalah skor >= 75, maka hasilnya...',
+                        options: ['Lulus', 'Tidak Lulus', 'Error', 'Kosong'],
+                        answer: 0 // Lulus
+                    },
+                    {
+                        question: 'Tanda kutip ("...") dalam pemrograman umumnya digunakan untuk tipe data...',
+                        options: ['Angka (Number)', 'Teks (String)', 'Logika (Boolean)', 'Komentar'],
+                        answer: 1 // Teks (String)
+                    }
+                ]
+            },
+            {
+                id: 'sains',
+                title: 'Sistem Tata Surya & Gravitasi',
+                subject: 'Ilmu Pengetahuan Alam',
+                duration: '15 Menit',
+                level: 'Umum',
+                color: 'from-amber-500 to-orange-600',
+                badgeBg: 'bg-amber-50 text-amber-700 border-amber-200',
+                icon: 'globe',
+                description: 'Jelajahi susunan planet di tata surya kita, karakteristik planet dalam dan luar, serta peran gaya gravitasi Matahari.',
+                tip: 'Urutan planet dari yang terdekat dengan Matahari: Merkurius, Venus, Bumi, Mars, Jupiter, Saturnus, Uranus, Neptunus.',
+                content: `
+                    <h4 class="font-heading font-bold text-lg text-slate-900">Susunan Tata Surya Kita</h4>
+                    <p>Tata surya terdiri dari <strong>Matahari</strong> sebagai pusatnya dan 8 planet yang mengelilinginya pada orbit masing-masing akibat gaya gravitasi Matahari.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
+                        <div class="bg-amber-50 p-3.5 rounded-xl border border-amber-200">
+                            <p class="font-bold text-amber-900 text-sm">Planet Dalam (Terestrial)</p>
+                            <p class="text-xs text-amber-800 mt-1">Merkurius, Venus, Bumi, Mars. Berukuran kecil dan tersusun dari batuan padat.</p>
+                        </div>
+                        <div class="bg-orange-50 p-3.5 rounded-xl border border-orange-200">
+                            <p class="font-bold text-orange-900 text-sm">Planet Luar (Raksasa Gas)</p>
+                            <p class="text-xs text-orange-800 mt-1">Jupiter, Saturnus, Uranus, Neptunus. Berukuran sangat besar dan tersusun dari gas & es.</p>
+                        </div>
+                    </div>
+                `,
+                quiz: [
+                    {
+                        question: 'Planet terbesar di dalam sistem Tata Surya kita adalah...',
+                        options: ['Saturnus', 'Bumi', 'Jupiter', 'Neptunus'],
+                        answer: 2 // Jupiter
+                    },
+                    {
+                        question: 'Gaya apa yang menjaga planet-planet tetap berada pada orbitnya mengelilingi Matahari?',
+                        options: ['Gaya Magnet', 'Gaya Gravitasi', 'Gaya Gesek', 'Gaya Listrik'],
+                        answer: 1 // Gaya Gravitasi
+                    },
+                    {
+                        question: 'Manakah yang termasuk kelompok Planet Dalam (berbatu)?',
+                        options: ['Mars', 'Saturnus', 'Uranus', 'Jupiter'],
+                        answer: 0 // Mars
+                    }
+                ]
+            }
+        ];
+
+        // 2. STATE APLIKASI & PENYIMPANAN LOCALSTORAGE
+        const STORAGE_USERS_KEY = 'pintarku_users_db';
+        const STORAGE_SESSION_KEY = 'pintarku_active_user';
+
+        let currentUser = null;
+        let currentFilter = 'semua';
+        let activeLessonId = null;
+
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            checkActiveSession();
+        });
+
+        // 3. SISTEM NOTIFIKASI TOAST (RAMAH PENGGUNA)
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-emerald-600 text-white shadow-emerald-500/30',
+                error: 'bg-rose-600 text-white shadow-rose-500/30',
+                info: 'bg-brand-600 text-white shadow-brand-500/30'
+            };
+
+            const icons = {
+                success: 'check-circle',
+                error: 'alert-circle',
+                info: 'info'
+            };
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg text-sm font-medium transform transition-all duration-300 translate-y-0 opacity-100 ${colors[type]}`;
+            toast.innerHTML = `
+                <i data-lucide="${icons[type]}" class="w-5 h-5 shrink-0"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // 4. LOGIKA AUTENTIKASI (LOGIN, REGISTER, DEMO, LOGOUT)
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const tabLogin = document.getElementById('tab-login');
+            const tabRegister = document.getElementById('tab-register');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                tabLogin.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl bg-white text-brand-600 shadow-sm transition-all';
+                tabRegister.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl text-slate-600 hover:text-slate-900 transition-all';
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                tabRegister.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl bg-white text-brand-600 shadow-sm transition-all';
+                tabLogin.className = 'flex-1 py-2.5 text-sm font-semibold rounded-xl text-slate-600 hover:text-slate-900 transition-all';
+            }
+        }
+
+        function getUsersDB() {
+            return JSON.parse(localStorage.getItem(STORAGE_USERS_KEY) || '[]');
+        }
+
+        function saveUsersDB(users) {
+            localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const grade = document.getElementById('reg-grade').value;
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+
+            const users = getUsersDB();
+            if (users.some(u => u.email === email)) {
+                showToast('Email sudah terdaftar! Silakan masuk akun.', 'error');
+                switchAuthTab('login');
+                document.getElementById('login-email').value = email;
+                return;
+            }
+
+            const newUser = {
+                name,
+                grade,
+                email,
+                password,
+                xp: 50, // Bonus XP pendaftaran baru
+                completedLessons: [] // Array berisi ID pelajaran yang selesai
+            };
+
+            users.push(newUser);
+            saveUsersDB(users);
+            setActiveUser(newUser);
+            showToast(`Selamat bergabung, ${name}! Kamu mendapat +50 XP awal.`);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+
+            const users = getUsersDB();
+            const foundUser = users.find(u => u.email === email && u.password === password);
+
+            if (!foundUser) {
+                showToast('Email atau kata sandi salah. Coba lagi atau gunakan Akun Demo!', 'error');
+                return;
+            }
+
+            setActiveUser(foundUser);
+            showToast(`Selamat datang kembali, ${foundUser.name}!`);
+        }
+
+        function loginDemoAccount() {
+            const demoEmail = 'pelajar.demo@pintarku.id';
+            let users = getUsersDB();
+            let demoUser = users.find(u => u.email === demoEmail);
+
+            if (!demoUser) {
+                demoUser = {
+                    name: 'Nadia Putri (Demo)',
+                    grade: 'SMA / SMK Kelas 10',
+                    email: demoEmail,
+                    password: 'demo',
+                    xp: 150,
+                    completedLessons: ['inggris'] // 1 materi sudah selesai sebagai contoh
+                };
+                users.push(demoUser);
+                saveUsersDB(users);
+            }
+
+            setActiveUser(demoUser);
+            showToast('Berhasil masuk menggunakan Akun Demo Pelajar!', 'info');
+        }
+
+        function setActiveUser(user) {
+            currentUser = user;
+            localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(user));
+            
+            // Sinkronkan juga ke array database users
+            const users = getUsersDB();
+            const idx = users.findIndex(u => u.email === user.email);
+            if (idx !== -1) {
+                users[idx] = user;
+                saveUsersDB(users);
+            }
+
+            renderDashboard();
+        }
+
+        function checkActiveSession() {
+            const savedSession = localStorage.getItem(STORAGE_SESSION_KEY);
+            if (savedSession) {
+                currentUser = JSON.parse(savedSession);
+                renderDashboard();
+            } else {
+                document.getElementById('auth-view').classList.remove('hidden');
+                document.getElementById('dashboard-view').classList.add('hidden');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem(STORAGE_SESSION_KEY);
+            currentUser = null;
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('auth-view').classList.remove('hidden');
+            showToast('Kamu telah keluar dari akun.', 'info');
+        }
+
+        // 5. RENDER DASHBOARD & KARTU PELAJARAN
+        function renderDashboard() {
+            if (!currentUser) return;
+
+            // Tampilkan dashboard, sembunyikan auth
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('dashboard-view').classList.add('flex');
+
+            // Update Info Navbar & Banner
+            const initial = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('nav-avatar').textContent = initial;
+            document.getElementById('nav-username').textContent = currentUser.name;
+            document.getElementById('nav-grade').textContent = currentUser.grade;
+            document.getElementById('nav-points').textContent = `${currentUser.xp} Poin XP`;
+            document.getElementById('welcome-name').textContent = currentUser.name.split(' ')[0];
+
+            // Hitung Progres Keseluruhan
+            const totalSubjects = SUBJECTS_DATA.length;
+            const completedCount = currentUser.completedLessons.length;
+            const percentage = Math.round((completedCount / totalSubjects) * 100);
+
+            document.getElementById('overall-progress-text').textContent = `${percentage}%`;
+            document.getElementById('overall-progress-bar').style.width = `${percentage}%`;
+            document.getElementById('completed-count-text').textContent = `${completedCount} dari ${totalSubjects} Materi Selesai`;
+
+            // Tentukan Lencana Level Pelajar
+            let badge = 'Pelajar Pemula 🌱';
+            if (completedCount === 1) badge = 'Penjelajah Ilmu 🚀';
+            else if (completedCount === 2) badge = 'Bintang Kelas ⭐';
+            else if (completedCount === 3) badge = 'Juara Belajar 🏆';
+            else if (completedCount === 4) badge = 'Master PintarKu 👑';
+            document.getElementById('badge-status').textContent = badge;
+
+            renderSubjectCards();
+        }
+
+        function filterSubjects(filterType) {
+            currentFilter = filterType;
+            
+            // Update tampilan tombol filter
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filterType) {
+                    btn.className = 'filter-btn active px-4 py-2 rounded-xl text-sm font-semibold bg-brand-600 text-white shadow-sm transition-all';
+                } else {
+                    btn.className = 'filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all';
+                }
+            });
+
+            renderSubjectCards();
+        }
+
+        function renderSubjectCards() {
+            const grid = document.getElementById('subjects-grid');
+            grid.innerHTML = '';
+
+            const filtered = SUBJECTS_DATA.filter(item => {
+                const isDone = currentUser.completedLessons.includes(item.id);
+                if (currentFilter === 'selesai') return isDone;
+                if (currentFilter === 'belum') return !isDone;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white rounded-3xl p-10 text-center border border-slate-200/80">
+                        <p class="text-slate-500 font-medium">Tidak ada mata pelajaran pada kategori filter ini.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const isDone = currentUser.completedLessons.includes(item.id);
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group';
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${item.color} text-white flex items-center justify-center shadow-md">
+                                <i data-lucide="${item.icon}" class="w-6 h-6"></i>
+                            </div>
+                            ${isDone 
+                                ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                     <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Selesai (+100 XP)
+                                   </span>`
+                                : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${item.badgeBg} border">
+                                     ${item.subject}
+                                   </span>`
+                            }
+                        </div>
+
+                        <h3 class="font-heading text-xl font-bold text-slate-900 group-hover:text-brand-600 transition-colors">
+                            ${item.title}
+                        </h3>
+                        <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                            ${item.description}
+                        </p>
+                    </div>
+
+                    <div class="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-4 text-xs font-medium text-slate-500">
+                            <span class="flex items-center gap-1">
+                                <i data-lucide="clock" class="w-4 h-4 text-slate-400"></i>
+                                ${item.duration}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i>
+                                ${item.level}
+                            </span>
+                        </div>
+
+                        <button onclick="openLessonModal('${item.id}')" class="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${isDone ? 'bg-slate-100 hover:bg-slate-200 text-slate-800' : 'bg-brand-600 hover:bg-brand-700 text-white shadow-sm'}">
+                            <span>${isDone ? 'Ulangi Materi' : 'Mulai Belajar'}</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        // 6. LOGIKA MODAL MATERI & KUIS INTERAKTIF
+        function openLessonModal(lessonId) {
+            activeLessonId = lessonId;
+            const lesson = SUBJECTS_DATA.find(s => s.id === lessonId);
+            if (!lesson) return;
+
+            // Atur Header Modal
+            const headerBg = document.getElementById('modal-header-bg');
+            headerBg.className = `p-6 text-white flex items-center justify-between bg-gradient-to-r ${lesson.color}`;
+            document.getElementById('modal-category-badge').textContent = lesson.subject;
+            document.getElementById('modal-title').textContent = lesson.title;
+            document.getElementById('modal-icon-box').innerHTML = `<i data-lucide="${lesson.icon}" class="w-6 h-6"></i>`;
+
+            // Isi Konten Materi
+            document.getElementById('lesson-body').innerHTML = lesson.content;
+            document.getElementById('lesson-tip').textContent = lesson.tip;
+
+            // Render Soal Kuis
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = '';
+            document.getElementById('quiz-result-box').classList.add('hidden');
+            document.getElementById('submit-quiz-btn').classList.remove('hidden');
+
+            lesson.quiz.forEach((q, qIndex) => {
+                const qBlock = document.createElement('div');
+                qBlock.className = 'bg-slate-50 p-5 rounded-2xl border border-slate-200/80 space-y-3';
+                
+                let optionsHTML = '';
+                q.options.forEach((opt, optIndex) => {
+                    optionsHTML += `
+                        <label class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-brand-500 transition-all">
+                            <input type="radio" name="quiz-q-${qIndex}" value="${optIndex}" class="w-4 h-4 text-brand-600 focus:ring-brand-500">
+                            <span class="text-sm font-medium text-slate-700">${opt}</span>
+                        </label>
+                    `;
+                });
+
+                qBlock.innerHTML = `
+                    <p class="font-semibold text-slate-900 text-sm sm:text-base">${qIndex + 1}. ${q.question}</p>
+                    <div class="space-y-2">${optionsHTML}</div>
+                `;
+                quizContainer.appendChild(qBlock);
+            });
+
+            switchModalTab('materi');
+            const modal = document.getElementById('lesson-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeLessonModal() {
+            const modal = document.getElementById('lesson-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            activeLessonId = null;
+        }
+
+        function switchModalTab(tab) {
+            const materiContent = document.getElementById('modal-content-materi');
+            const kuisContent = document.getElementById('modal-content-kuis');
+            const tabMateri = document.getElementById('modal-tab-materi');
+            const tabKuis = document.getElementById('modal-tab-kuis');
+
+            if (tab === 'materi') {
+                materiContent.classList.remove('hidden');
+                kuisContent.classList.add('hidden');
+                tabMateri.className = 'pb-3 text-sm font-bold border-b-2 border-brand-600 text-brand-600 flex items-center gap-2';
+                tabKuis.className = 'pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2';
+            } else {
+                materiContent.classList.add('hidden');
+                kuisContent.classList.remove('hidden');
+                tabKuis.className = 'pb-3 text-sm font-bold border-b-2 border-brand-600 text-brand-600 flex items-center gap-2';
+                tabMateri.className = 'pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2';
+            }
+        }
+
+        function submitQuiz() {
+            const lesson = SUBJECTS_DATA.find(s => s.id === activeLessonId);
+            if (!lesson) return;
+
+            let correctCount = 0;
+            let unanswered = false;
+
+            lesson.quiz.forEach((q, idx) => {
+                const selected = document.querySelector(`input[name="quiz-q-${idx}"]:checked`);
+                if (!selected) {
+                    unanswered = true;
+                } else if (parseInt(selected.value) === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            if (unanswered) {
+                showToast('Harap jawab semua pertanyaan kuis terlebih dahulu!', 'error');
+                return;
+            }
+
+            const totalQuestions = lesson.quiz.length;
+            const score = Math.round((correctCount / totalQuestions) * 100);
+            const isPassed = correctCount >= 2; // Minimal benar 2 dari 3 untuk lulus
+
+            const resultBox = document.getElementById('quiz-result-box');
+            const resultIcon = document.getElementById('quiz-result-icon');
+            const resultTitle = document.getElementById('quiz-result-title');
+            const resultDesc = document.getElementById('quiz-result-desc');
+
+            resultBox.classList.remove('hidden');
+
+            if (isPassed) {
+                resultBox.className = 'rounded-2xl p-5 border border-emerald-200 bg-emerald-50 text-center space-y-2';
+                resultIcon.className = 'w-12 h-12 rounded-full mx-auto flex items-center justify-center bg-emerald-500 text-white';
+                resultIcon.innerHTML = `<i data-lucide="award" class="w-6 h-6"></i>`;
+                resultTitle.className = 'font-heading text-lg font-bold text-emerald-900';
+                resultTitle.textContent = `Hebat! Nilai Kamu ${score} (${correctCount}/${totalQuestions} Benar)`;
+
+                // Cek apakah materi ini baru pertama kali diselesaikan
+                if (!currentUser.completedLessons.includes(lesson.id)) {
+                    currentUser.completedLessons.push(lesson.id);
+                    currentUser.xp += 100;
+                    setActiveUser(currentUser);
+                    resultDesc.className = 'text-sm text-emerald-800 font-medium';
+                    resultDesc.textContent = 'Selamat! Materi ditandai selesai dan kamu mendapatkan +100 Poin XP!';
+                    showToast('Materi Selesai! +100 Poin XP ditambahkan.', 'success');
+                } else {
+                    resultDesc.className = 'text-sm text-emerald-800';
+                    resultDesc.textContent = 'Kamu sudah menyelesaikan materi ini sebelumnya. Terus pertahankan prestasimu!';
+                }
+            } else {
+                resultBox.className = 'rounded-2xl p-5 border border-amber-200 bg-amber-50 text-center space-y-2';
+                resultIcon.className = 'w-12 h-12 rounded-full mx-auto flex items-center justify-center bg-amber-500 text-white';
+                resultIcon.innerHTML = `<i data-lucide="rotate-ccw" class="w-6 h-6"></i>`;
+                resultTitle.className = 'font-heading text-lg font-bold text-amber-900';
+                resultTitle.textContent = `Nilai Kamu ${score} (${correctCount}/${totalQuestions} Benar)`;
+                resultDesc.className = 'text-sm text-amber-800';
+                resultDesc.textContent = 'Jawab minimal 2 soal dengan benar untuk menyelesaikan materi ini. Yuk baca materinya lagi dan coba kembali!';
+            }
+
+            lucide.createIcons();
+        }
+
+        // 7. MODAL PROFIL & RESET PROGRES
+        function openProfileModal() {
+            if (!currentUser) return;
+            document.getElementById('profile-avatar-large').textContent = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('profile-name').textContent = currentUser.name;
+            document.getElementById('profile-email').textContent = currentUser.email;
+            document.getElementById('profile-grade').textContent = currentUser.grade;
+            document.getElementById('profile-xp').textContent = `${currentUser.xp} XP`;
+            document.getElementById('profile-completed').textContent = `${currentUser.completedLessons.length} / ${SUBJECTS_DATA.length}`;
+
+            const modal = document.getElementById('profile-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+
+        function closeProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function resetProgress() {
+            if (!currentUser) return;
+            currentUser.completedLessons = [];
+            currentUser.xp = 50;
+            setActiveUser(currentUser);
+            showToast('Progres belajar berhasil di-reset ke awal.', 'info');
+        }
+    </script>
+</body>
+</html>
